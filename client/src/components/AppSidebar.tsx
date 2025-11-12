@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { Globe, BarChart3, TrendingUp, AlertCircle, Zap, FileText } from "lucide-react";
+import { Globe, BarChart3, TrendingUp, AlertCircle, Zap, FileText, Radio, Settings } from "lucide-react";
 
 const menuItems = [
   {
@@ -42,6 +42,16 @@ const menuItems = [
     title: "Regulatory Feed",
     url: "/regulatory",
     icon: FileText,
+  },
+  {
+    title: "Real-time Feeds",
+    url: "/feeds",
+    icon: Radio,
+  },
+  {
+    title: "Portfolio Config",
+    url: "/config",
+    icon: Settings,
   },
 ];
 

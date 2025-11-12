@@ -1,6 +1,7 @@
 import GapAssessment, { type Gap } from "@/components/GapAssessment";
 import { Card } from "@/components/ui/card";
-import { Brain, TrendingUp, AlertTriangle } from "lucide-react";
+import { Brain, TrendingUp, AlertTriangle, Target, DollarSign, Shield } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export default function GapsPage() {
   const gaps: Gap[] = [
@@ -8,7 +9,7 @@ export default function GapsPage() {
       id: "1",
       type: "compliance",
       title: "Missing CbCR Filing - India",
-      description: "AI Analysis: Country-by-Country Report for FY2024 not filed. Deadline approaching in 30 days. Cross-reference engine detected master file update in Germany (filed 10/15) but corresponding Indian CbCR missing. Pattern recognition indicates this gap emerged after organizational restructure in Q2 2024. High penalty risk: INR 500K + potential transfer pricing audit trigger.",
+      description: "Country-by-Country Report for FY2024 not filed. Deadline approaching in 30 days.",
       jurisdiction: "India",
       severity: "high",
       dueDate: "2025-12-15",
@@ -17,7 +18,7 @@ export default function GapsPage() {
       id: "2",
       type: "position",
       title: "Transfer Pricing Documentation Gap - China",
-      description: "AI Analysis: Intercompany service agreements lack contemporaneous documentation required under new SAT Announcement 6 rules. ML model detected documentation quality score of 42/100 (threshold: 75). Specifically missing: detailed service descriptions, benefit test analysis, and benchmarking study for R&D cost-sharing. Historical audit data shows 89% probability of adjustment when documentation gaps exceed 3 items. Estimated exposure: $2.8M-4.1M based on similar cases.",
+      description: "Intercompany service agreements lack contemporaneous documentation required under new SAT Announcement 6 rules.",
       jurisdiction: "China",
       severity: "high",
       dueDate: "2025-12-31",
@@ -26,7 +27,7 @@ export default function GapsPage() {
       id: "3",
       type: "opportunity",
       title: "Unclaimed R&D Tax Credits - USA",
-      description: "AI Analysis: Renewable energy R&D activities in Q1-Q3 2024 eligible for Section 41 credits + IRA enhanced incentives totaling $3.2M not claimed in prior year filing. Natural language processing of project documentation identified 47 qualifying activities across wind turbine efficiency and energy storage initiatives. Confidence level: 94%. Recommendation: File amended return with Form 6765 and substantiation memo. IRS acceptance probability: 87% based on similar fact patterns.",
+      description: "Renewable energy R&D activities in Q1-Q3 2024 eligible for Section 41 credits + IRA enhanced incentives not claimed in prior year filing.",
       jurisdiction: "USA",
       severity: "medium",
     },
@@ -34,7 +35,7 @@ export default function GapsPage() {
       id: "4",
       type: "risk",
       title: "PE Exposure - Germany",
-      description: "AI Analysis: Increased local activities may create permanent establishment under updated treaty interpretation (BMF guidance 10/2024). Activity pattern recognition detected: (1) German employees spending 180+ days on project sites, (2) Local contract signature authority granted in August, (3) Warehouse established with 6-month+ inventory cycle. PE probability score: 76%. Potential tax impact: €4.5M annually if PE declared + 5.5% trade tax. Recommended actions: Restructure activities, obtain advance ruling, or file protective returns.",
+      description: "Increased local activities may create permanent establishment under updated treaty interpretation (BMF guidance 10/2024).",
       jurisdiction: "Germany",
       severity: "high",
     },
@@ -42,7 +43,7 @@ export default function GapsPage() {
       id: "5",
       type: "compliance",
       title: "E-Invoicing Mandate - France",
-      description: "AI Analysis: New B2B e-invoicing requirements effective Q1 2026. System integration gap identified. Current ERP (SAP S/4HANA) requires Chorus Pro API integration + Peppol network connection. Complexity score: 8/10. Timeline risk: Implementation requires 90-120 days based on similar deployments, leaving only 47-day buffer. Non-compliance penalties: 15€ per invoice (estimated annual exposure: €450K based on 30K invoices/year). Competitor analysis shows 67% have already initiated integration projects.",
+      description: "New B2B e-invoicing requirements effective Q1 2026. System integration gap identified.",
       jurisdiction: "France",
       severity: "medium",
       dueDate: "2026-01-01",
@@ -51,7 +52,7 @@ export default function GapsPage() {
       id: "6",
       type: "position",
       title: "Pillar Two GloBE Calculation - UK",
-      description: "AI Analysis: Global minimum tax calculation methodology requires validation against OECD safe harbors for FY2025. Preliminary ETR calculation shows 13.2% (below 15% threshold) due to: (1) Qualified refundable tax credits (IRA benefits) reducing covered taxes, (2) Stock-based compensation timing differences, (3) Substance-based income exclusion computation errors. GloBE top-up tax exposure estimated at £12.3M. Safe harbor eligibility: CbCR safe harbor fails, but de minimis exception may apply (revenue £18.2M in UK). Recommendation: Detailed substance calculation and potential restructuring of IP ownership.",
+      description: "Global minimum tax calculation methodology requires validation against OECD safe harbors for FY2025.",
       jurisdiction: "UK",
       severity: "high",
       dueDate: "2025-12-20",
@@ -60,7 +61,7 @@ export default function GapsPage() {
       id: "7",
       type: "opportunity",
       title: "Renewable Energy Credits - India",
-      description: "AI Analysis: Solar project investments in Rajasthan (commissioned Q2 2024) qualify for accelerated depreciation benefits at 40% (vs standard 15%) not yet claimed in advance tax calculations. Additionally eligible for: (1) Interest subsidy under MNRE scheme (~INR 8M over 5 years), (2) Generation-based incentive at INR 0.75/kWh, (3) Excise duty exemption on equipment. Total unclaimed value: INR 42M NPV. Claim probability: 98% based on project documentation review and precedent analysis.",
+      description: "Solar project investments in Rajasthan (commissioned Q2 2024) qualify for accelerated depreciation benefits at 40% not yet claimed.",
       jurisdiction: "India",
       severity: "low",
     },
@@ -68,7 +69,7 @@ export default function GapsPage() {
       id: "8",
       type: "risk",
       title: "Withholding Tax Exposure - China",
-      description: "AI Analysis: Service payments to Singapore parent ($18.6M in 2024) may trigger 10% withholding under revised tax treaty interpretation (SAT Bulletin 37 implications). Current position: services classified as 'technical services' exempt under Article 12(3). Risk factors: (1) SAT's narrowing interpretation in recent rulings, (2) Benefit test may fail due to primary beneficiary analysis, (3) Similar transactions audited in 3 peer companies with 100% assessment rate. Estimated exposure: $1.86M + interest + 50% penalty = $3.1M total. Mitigation: Restructure as cost reimbursement or obtain advance ruling.",
+      description: "Service payments to Singapore parent ($18.6M in 2024) may trigger 10% withholding under revised tax treaty interpretation.",
       jurisdiction: "China",
       severity: "medium",
     },
@@ -76,7 +77,7 @@ export default function GapsPage() {
       id: "9",
       type: "compliance",
       title: "Pillar Two IIR Filing - France",
-      description: "AI Analysis: Income Inclusion Rule (IIR) filing required by 12/31/2025 for French parent company. AI detected 14 low-taxed constituent entities across 6 jurisdictions requiring top-up tax calculation. GloBE Information Return complexity score: 9.5/10 due to: (1) Joint ventures requiring equity method adjustments, (2) Multi-tiered holding structure, (3) Push-down accounting implications. Estimated preparation time: 450-600 hours. Current resource allocation: insufficient. Recommend: Engage Big 4 for GIR preparation + implement Pillar Two tax engine software.",
+      description: "Income Inclusion Rule (IIR) filing required by 12/31/2025 for French parent company.",
       jurisdiction: "France",
       severity: "high",
       dueDate: "2025-12-31",
@@ -85,7 +86,7 @@ export default function GapsPage() {
       id: "10",
       type: "opportunity",
       title: "Energy Efficiency Tax Deduction - USA",
-      description: "AI Analysis: Section 179D commercial building energy efficiency deduction available for 3 facilities upgraded in 2024 (total sq ft: 2.4M). Energy models show 30-40% reduction vs ASHRAE baseline, qualifying for $2.50-5.00/sq ft deduction. Estimated benefit: $8.2M. Requirements: (1) Obtain certification from qualified professional, (2) Substantiate costs >$0.50/sq ft threshold, (3) Document prevailing wage compliance for enhanced rates. AI cross-check with utility bills confirms savings. Claim confidence: 91%.",
+      description: "Section 179D commercial building energy efficiency deduction available for 3 facilities upgraded in 2024.",
       jurisdiction: "USA",
       severity: "medium",
     },
@@ -93,7 +94,7 @@ export default function GapsPage() {
       id: "11",
       type: "position",
       title: "Controlled Foreign Corporation (CFC) Attribution - USA",
-      description: "AI Analysis: Subpart F income calculations for 8 CFCs may overstate GILTI inclusion by $12.4M due to: (1) Incorrect high-tax exclusion elections, (2) Qualified business asset investment (QBAI) understated by 18% (missing leased assets), (3) Foreign tax credit pooling errors. Recomputation using corrected methodology shows potential refund of $3.1M for tax years 2022-2024. Risk: Amended returns may trigger IRS examination. Probability of sustaining position: 78% based on technical analysis and supporting case law.",
+      description: "Subpart F income calculations for 8 CFCs may overstate GILTI inclusion by $12.4M due to incorrect high-tax exclusion elections.",
       jurisdiction: "USA",
       severity: "high",
     },
@@ -101,7 +102,7 @@ export default function GapsPage() {
       id: "12",
       type: "risk",
       title: "VAT Recovery Limitation - UK",
-      description: "AI Analysis: Input VAT recovery on mixed-use assets (corporate aircraft, dual-purpose vehicles) may be overstated. HMRC's VAT Notice 700/64 analysis shows recovery position exceeds safe harbor by 23%. Audit probability model: 68% likelihood of HMRC challenge within 24 months. Exposure: £2.8M input VAT disallowance + assessments for prior 4-year period = £11.2M + interest. Recommendation: Voluntary disclosure under Code of Practice 9 would reduce penalties from 100% to 30%; net savings: £5.6M.",
+      description: "Input VAT recovery on mixed-use assets (corporate aircraft, dual-purpose vehicles) may be overstated.",
       jurisdiction: "UK",
       severity: "high",
     },
@@ -109,7 +110,7 @@ export default function GapsPage() {
       id: "13",
       type: "compliance",
       title: "Indirect Tax Compliance - India (GST)",
-      description: "AI Analysis: Electronic credit ledger reconciliation shows INR 34M in input tax credit claims without corresponding supplier filings in GSTR-2A (mismatch rate: 18%). Common causes: (1) Supplier filing delays, (2) GSTIN mismatches, (3) Invoice date misalignment. Compliance risk: ITC reversal + 18% interest + potential penalty (100% of tax). Rule 36(4) requires reversal if supplier doesn't file within 180 days. Recommendation: Immediate supplier outreach campaign + file GSTR-3B with protective reversal to avoid interest.",
+      description: "Electronic credit ledger reconciliation shows INR 34M in input tax credit claims without corresponding supplier filings in GSTR-2A.",
       jurisdiction: "India",
       severity: "high",
       dueDate: "2025-12-10",
@@ -118,7 +119,7 @@ export default function GapsPage() {
       id: "14",
       type: "opportunity",
       title: "Film & TV Production Tax Credit - UK",
-      description: "AI Analysis: Corporate video production expenses ($4.8M in 2024) for training, marketing, and technical documentation may qualify for Audio-Visual Expenditure Credit at 34%. AI classification of expenditures identified: (1) $2.1M in qualifying production costs, (2) 80% UK spend requirement met, (3) Cultural test likely passed based on content analysis. Estimated credit: $714K. Note: Recent HMRC manuals clarify corporate videos can qualify if intended for public release. Claim success probability: 62% (moderate due to novel interpretation).",
+      description: "Corporate video production expenses ($4.8M in 2024) for training, marketing, and technical documentation may qualify for AVEC at 34%.",
       jurisdiction: "UK",
       severity: "low",
     },
@@ -126,7 +127,7 @@ export default function GapsPage() {
       id: "15",
       type: "position",
       title: "Customs Valuation - China",
-      description: "AI Analysis: Transfer pricing for intercompany imports may not align with customs valuation methods, creating potential adjustments. Discrepancy detected: TP arm's length price (cost + 8% markup) vs customs declared value (cost + 3%). Undervaluation exposure: RMB 48M over 3 years. Customs authorities increasingly sharing data with tax bureau. Risk: (1) Import duty assessments (RMB 7.2M), (2) VAT on adjustment (RMB 6.2M), (3) Penalties up to 100%. Recommendation: Conduct advance pricing arrangement (APA) covering both tax and customs, or adjust customs values prospectively with protective disclosure.",
+      description: "Transfer pricing for intercompany imports may not align with customs valuation methods, creating potential adjustments.",
       jurisdiction: "China",
       severity: "high",
     },
@@ -176,6 +177,99 @@ export default function GapsPage() {
             );
           })}
         </div>
+
+        {/* AI Assessment Section with Sub-headings */}
+        <Card className="p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Brain className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-bold">AI-Powered Gap Analysis</h2>
+          </div>
+          
+          <div className="space-y-6">
+            {/* Pattern Recognition */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Target className="h-5 w-5 text-accent" />
+                <h3 className="text-lg font-semibold">Pattern Recognition & Detection</h3>
+              </div>
+              <div className="bg-muted/30 rounded-md p-4 space-y-2">
+                <p className="text-sm"><span className="font-semibold">Cross-Reference Analysis:</span> Master file update in Germany (filed 10/15) detected, but corresponding Indian CbCR missing. Pattern emerged after Q2 2024 organizational restructure.</p>
+                <p className="text-sm"><span className="font-semibold">Documentation Quality Score:</span> China transfer pricing documentation scored 42/100 (threshold: 75). Missing elements: detailed service descriptions, benefit test analysis, and benchmarking study for R&D cost-sharing.</p>
+                <p className="text-sm"><span className="font-semibold">Activity Pattern Recognition:</span> German PE risk identified through pattern analysis: (1) employees spending 180+ days on project sites, (2) local contract signature authority granted in August, (3) warehouse with 6-month+ inventory cycle.</p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Probability Scoring */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="h-5 w-5 text-accent" />
+                <h3 className="text-lg font-semibold">ML-Powered Probability Scoring</h3>
+              </div>
+              <div className="bg-muted/30 rounded-md p-4 space-y-2">
+                <p className="text-sm"><span className="font-semibold">Audit Probability:</span> Historical audit data shows 89% probability of adjustment when Chinese TP documentation gaps exceed 3 items. Current gaps: 4 items.</p>
+                <p className="text-sm"><span className="font-semibold">PE Declaration Probability:</span> Germany permanent establishment score: 76% based on activity patterns, treaty interpretation updates, and similar cases.</p>
+                <p className="text-sm"><span className="font-semibold">Claim Success Rates:</span> R&D tax credit opportunity confidence level: 94%. IRS acceptance probability: 87% based on similar fact patterns and supporting documentation quality.</p>
+                <p className="text-sm"><span className="font-semibold">HMRC Challenge Likelihood:</span> UK VAT recovery position audit probability: 68% likelihood within 24 months based on deviation from safe harbor thresholds.</p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Exposure Calculation */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <DollarSign className="h-5 w-5 text-accent" />
+                <h3 className="text-lg font-semibold">Financial Exposure Calculations</h3>
+              </div>
+              <div className="bg-muted/30 rounded-md p-4 space-y-2">
+                <p className="text-sm"><span className="font-semibold">India CbCR Penalty Risk:</span> INR 500K penalty + potential transfer pricing audit trigger (estimated exposure: INR 8.5M based on transaction volume).</p>
+                <p className="text-sm"><span className="font-semibold">China TP Adjustment Range:</span> $2.8M-4.1M estimated exposure based on benchmark analysis of 284 similar SAT adjustments in 2023-2025.</p>
+                <p className="text-sm"><span className="font-semibold">Germany PE Tax Impact:</span> €4.5M annually if PE declared + 5.5% trade tax. Cumulative 3-year exposure: €13.5M.</p>
+                <p className="text-sm"><span className="font-semibold">UK VAT Exposure:</span> £2.8M input VAT disallowance + prior 4-year assessments = £11.2M + interest. Voluntary disclosure could reduce penalties by £5.6M.</p>
+                <p className="text-sm"><span className="font-semibold">Unclaimed Opportunities:</span> $12.1M total value across R&D credits ($3.2M), renewable energy incentives (INR 42M = $5.1M), and energy efficiency deductions ($3.8M).</p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Strategic Recommendations */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Shield className="h-5 w-5 text-accent" />
+                <h3 className="text-lg font-semibold">Strategic Recommendations</h3>
+              </div>
+              <div className="bg-muted/30 rounded-md p-4 space-y-3">
+                <div>
+                  <p className="text-sm font-semibold mb-1">High Priority (30-day action required):</p>
+                  <ul className="text-sm space-y-1 ml-4">
+                    <li>• File India CbCR immediately to avoid INR 500K penalty (deadline: 12/15)</li>
+                    <li>• Initiate China TP documentation remediation project (engage Big 4 firm)</li>
+                    <li>• File amended US return for R&D credits (Form 6765) - $3.2M recovery opportunity</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold mb-1">Medium Priority (60-90 day action window):</p>
+                  <ul className="text-sm space-y-1 ml-4">
+                    <li>• Germany: Restructure activities to mitigate PE risk or obtain advance ruling</li>
+                    <li>• UK: Consider voluntary disclosure for VAT position (save £5.6M in penalties)</li>
+                    <li>• France: Accelerate e-invoicing system integration (47-day buffer insufficient)</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold mb-1">Optimization Opportunities:</p>
+                  <ul className="text-sm space-y-1 ml-4">
+                    <li>• Claim India renewable energy credits (INR 42M NPV, 98% success probability)</li>
+                    <li>• Review US CFC calculations for $12.4M GILTI overstatement correction</li>
+                    <li>• Initiate bilateral APA with IRS/SAT for China transfer pricing certainty</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
         <GapAssessment gaps={gaps} onGapClick={(gap) => console.log("Gap clicked:", gap.title)} />
       </div>
     </div>
