@@ -3,25 +3,72 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import Dashboard from "@/pages/Dashboard";
+import PortfolioMetricsPage from "@/pages/PortfolioMetricsPage";
+import ProbabilityPage from "@/pages/ProbabilityPage";
+import GapsPage from "@/pages/GapsPage";
+import EnergyPage from "@/pages/EnergyPage";
+import RegulatoryPage from "@/pages/RegulatoryPage";
 import NotFound from "@/pages/not-found";
+import { Bell, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 function Router() {
   return (
     <Switch>
-      {/* Add pages below */}
-      {/* <Route path="/" component={Home}/> */}
-      {/* Fallback to 404 */}
+      <Route path="/" component={Dashboard} />
+      <Route path="/metrics" component={PortfolioMetricsPage} />
+      <Route path="/probability" component={ProbabilityPage} />
+      <Route path="/gaps" component={GapsPage} />
+      <Route path="/energy" component={EnergyPage} />
+      <Route path="/regulatory" component={RegulatoryPage} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
+  const style = {
+    "--sidebar-width": "16rem",
+    "--sidebar-width-icon": "3rem",
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <SidebarProvider style={style as React.CSSProperties}>
+          <div className="flex h-screen w-full">
+            <AppSidebar />
+            <div className="flex flex-col flex-1 overflow-hidden">
+              <header className="flex items-center justify-between p-4 border-b border-border bg-card">
+                <div className="flex items-center gap-4">
+                  <SidebarTrigger data-testid="button-sidebar-toggle" />
+                  <div className="relative w-96">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search jurisdictions, regulations, or alerts..."
+                      className="pl-10"
+                      data-testid="input-search"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" className="relative" data-testid="button-notifications">
+                    <Bell className="h-5 w-5" />
+                    <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full" />
+                  </Button>
+                </div>
+              </header>
+              <main className="flex-1 overflow-auto">
+                <Router />
+              </main>
+            </div>
+          </div>
+        </SidebarProvider>
         <Toaster />
-        <Router />
       </TooltipProvider>
     </QueryClientProvider>
   );
