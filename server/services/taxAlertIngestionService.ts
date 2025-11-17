@@ -11,12 +11,58 @@
 import { getDbService } from '../db/taxAlertService';
 import type { TaxAlert as AiTaxAlert } from '../ai/taxAlertExtraction';
 import type { TaxAlert as DbTaxAlert } from '../db/schema';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Dynamic import to work around tsx/ESM module loading issues
 async function extractTaxAlert(text: string, apiKey?: string): Promise<AiTaxAlert> {
   const { default: TaxAlertExtractionService } = await import('../ai/taxAlertExtraction');
   const service = new (TaxAlertExtractionService as any)(apiKey);
   return service.extractTaxAlert(text);
+}
+
+/**
+ * Extract text from PDF file using pdfjs-dist
+ * Similar to PyMuPDF approach in Python
+ */
+async function extractTextFromPdf(pdfFilePath: string): Promise<string> {
+  try {
+    // Validate file exists
+    if (!fs.existsSync(pdfFilePath)) {
+      throw new Error(`PDF file not found: ${pdfFilePath}`);
+    }
+
+    // Import pdfjs for PDF parsing
+    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const dataBuffer = fs.readFileSync(pdfFilePath);
+    const uint8Array = new Uint8Array(dataBuffer);
+    const pdf = await pdfjsLib.getDocument({ data: uint8Array }).promise;
+    
+    let fullText = '';
+    const numPages = pdf.numPages;
+
+    // Extract text from each page
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str || '')
+        .join(' ');
+      fullText += pageText + '\n';
+    }
+
+    if (!fullText || fullText.trim().length === 0) {
+      throw new Error('No text could be extracted from PDF');
+    }
+
+    console.log(`✅ Extracted ${fullText.length} characters from ${path.basename(pdfFilePath)}`);
+    console.log(`   Pages: ${numPages}`);
+
+    return fullText;
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to extract PDF text: ${errorMsg}`);
+  }
 }
 
 /**
@@ -63,6 +109,22 @@ export class TaxAlertIngestionService {
 
     try {
       console.log(`🚀 Starting tax alert ingestion...`);
+      
+      // Step 0: If sourceDocument is provided and is a filename, extract from PDF
+      if (options.sourceDocument && !options.sourceDocument.includes('\\') && !options.sourceDocument.includes('/')) {
+        try {
+          const pdfPath = path.join(process.cwd(), 'data', 'pdfs', options.sourceDocument);
+          if (fs.existsSync(pdfPath)) {
+            console.log(`📄 Extracting text from PDF file: ${options.sourceDocument}`);
+            text = await extractTextFromPdf(pdfPath);
+          }
+        } catch (pdfError) {
+          const errorMsg = pdfError instanceof Error ? pdfError.message : String(pdfError);
+          console.warn(`⚠️  Could not extract PDF: ${errorMsg}`);
+          // Continue with original text if extraction fails
+        }
+      }
+
       console.log(`📝 Text length: ${text.length} characters`);
 
       // Step 1: Validate input
