@@ -22,6 +22,7 @@ const ingestTextSchema = z.object({
   sourceDocument: z.string().optional(),
   saveSourceText: z.boolean().optional().default(false),
   minConfidence: z.number().min(0).max(1).optional().default(0),
+  extractLatestTaxNews: z.boolean().optional()
 });
 
 /**
@@ -109,12 +110,13 @@ function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => P
  * }
  */
 router.post('/ingest', validate(ingestTextSchema), asyncHandler(async (req, res) => {
-  const { text, sourceDocument, saveSourceText, minConfidence } = req.body;
+  const { text, sourceDocument, saveSourceText, minConfidence, extractLatestTaxNews } = req.body;
 
   const result = await ingestionService.ingest(text, {
     sourceDocument,
     saveSourceText,
-    minConfidence
+    minConfidence,
+    extractLatestTaxNews
   });
 
   if (result.success) {

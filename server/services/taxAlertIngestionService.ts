@@ -66,6 +66,45 @@ async function extractTextFromPdf(pdfFilePath: string): Promise<string> {
 }
 
 /**
+ * Fetch top news articles from NewsAPI.org
+ * Returns an array of simplified article objects
+ */
+async function fetchTopNews(query: string, apiKey?: string, topN: number = 20) {
+  const key = apiKey || process.env.NEWSAPI_KEY;
+  if (!key) {
+    throw new Error('NEWSAPI_KEY required to fetch news from NewsAPI.org');
+  }
+
+  const params = new URLSearchParams({
+    q: query,
+    language: 'en',
+    pageSize: String(topN),
+    from: "2025-11-01",
+    sources: 'bbc-news,the-guardian,reuters,the-verge',
+    apiKey: key
+  });
+
+  const url = `https://newsapi.org/v2/everything?${params.toString()}`;
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`NewsAPI request failed: ${res.status} ${body}`);
+  }
+
+  const json = await res.json();
+  const articles = (json.articles || []).map((a: any) => ({
+    title: a.title || '',
+    description: a.description || '',
+    url: a.url,
+    source: a.source?.name,
+    publishedAt: a.publishedAt
+  }));
+
+  return articles;
+}
+
+/**
  * Ingestion options
  */
 export interface IngestionOptions {
@@ -73,6 +112,7 @@ export interface IngestionOptions {
   saveSourceText?: boolean;      // Whether to store original text in DB
   minConfidence?: number;        // Minimum confidence threshold (default: 0.0)
   apiKey?: string;              // Optional: Override API key
+  extractLatestTaxNews?: boolean;
 }
 
 /**
@@ -109,7 +149,57 @@ export class TaxAlertIngestionService {
 
     try {
       console.log(`🚀 Starting tax alert ingestion...`);
+
+      console.log(`🔔 extractLatestTaxNews status — "${options.extractLatestTaxNews}"`);
       
+      // Special: if extractLatestTaxNews is true OR no text provided, fetch news using the provided text as query
+      if (options.extractLatestTaxNews) {
+        try {
+          console.log(`🔔 extractLatestTaxNews enabled"`);
+          const articles = await fetchTopNews("tax", options.apiKey, 5);
+
+          // Build a JSON wrapper in the same pattern you described and ingest each title
+          for (let i = 0; i < articles.length; i++) {
+            const a = articles[i];
+            const jsonPayload = JSON.stringify({
+              status: 'ok',
+              totalResults: articles.length,
+              articles: articles
+            });
+
+            // We instruct the AI to extract info from the `title` field of each article.
+            const promptText = `You will receive a JSON object containing an array of news articles in the field \"articles\".\n` +
+              `For each article, extract structured tax-related information from the article TITLE only. Ignore the description and content.\n` +
+              `Respond with the same structure expected by the tax alert extractor. Here is the JSON:\n\n` + jsonPayload;
+
+            console.log(`📰 Sending article ${i + 1}/${articles.length} title to AI extractor: ${a.title}`);
+
+            const aiOutput = await extractTaxAlert(promptText, options.apiKey);
+
+            // Save each extracted alert to DB (use sourceDocument to reference news)
+            const savedAlert = await this.db.createFromAiOutput(
+              aiOutput,
+              `news:${a.source || 'unknown'}:${i + 1}`,
+              options.saveSourceText ? a.title : undefined
+            );
+
+            console.log(`💾 Saved news-derived alert ID: ${savedAlert.id}`);
+            // Return first successful result for the single-ingest API semantics
+            return {
+              success: true,
+              alert: savedAlert,
+              aiOutput,
+              confidence: aiOutput.confidence?.overall_score,
+              savedToDb: true
+            } as IngestionResult;
+          }
+        } catch (newsErr) {
+          const errMsg = newsErr instanceof Error ? newsErr.message : String(newsErr);
+          console.error(`❌ Failed to fetch or ingest latest market news: ${errMsg}`);
+          // fall through to normal ingestion flow
+        }
+      }
+
       // Step 0: If sourceDocument is provided and is a filename, extract from PDF
       if (options.sourceDocument && !options.sourceDocument.includes('\\') && !options.sourceDocument.includes('/')) {
         try {
@@ -227,6 +317,54 @@ export class TaxAlertIngestionService {
     console.log(`   ❌ Failed: ${failureCount}`);
 
     return results;
+  }
+
+  /**
+   * Ingest news articles fetched from NewsAPI for a given query.
+   * Each article's title+description is passed through the same ingestion pipeline.
+   */
+  async ingestNews(query: string, options: IngestionOptions = {}, topN: number = 5): Promise<IngestionResult[]> {
+    console.log(`🔎 Fetching top ${topN} news for query: "${query}"`);
+    const results: IngestionResult[] = [];
+
+    try {
+      const articles = await fetchTopNews(query, options.apiKey, topN);
+
+      for (let i = 0; i < articles.length; i++) {
+        const a = articles[i];
+        const content = `Title: ${a.title}\n\nDescription: ${a.description}\n\nSource: ${a.source || ''}\nURL: ${a.url || ''}`;
+
+        console.log(`📰 Ingesting article ${i + 1}/${articles.length}: ${a.title}`);
+
+        const result = await this.ingest(content, {
+          ...options,
+          sourceDocument: `news:${a.source || 'unknown'}:${i + 1}`,
+          saveSourceText: options.saveSourceText ?? true
+        });
+
+        results.push(result);
+      }
+
+      return results;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      console.error(`❌ News ingestion failed: ${errorMsg}`);
+      return [{ success: false, error: errorMsg }];
+    }
+  }
+
+  /**
+   * Ingest news for multiple queries in batch
+   */
+  async ingestNewsBatch(queries: string[], options: IngestionOptions = {}, topN: number = 5) {
+    const allResults: IngestionResult[] = [];
+    for (let i = 0; i < queries.length; i++) {
+      console.log(`
+📄 Processing news query ${i + 1}/${queries.length}: ${queries[i]}`);
+      const res = await this.ingestNews(queries[i], options, topN);
+      allResults.push(...res);
+    }
+    return allResults;
   }
 
   /**
