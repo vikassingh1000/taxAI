@@ -3,6 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import taxAlertRoutes from "./routes/taxAlertRoutes";
+import newsConnectorRoutes from "./routes/newsConnectorRoutes";
 
 const app = express();
 
@@ -51,6 +52,9 @@ app.use((req, res, next) => {
 (async () => {
   // Register tax alert API routes
   app.use('/api/tax-alerts', taxAlertRoutes);
+  
+  // Register news connector API routes
+  app.use('/api/news-connector', newsConnectorRoutes);
 
   const server = await registerRoutes(app);
 

@@ -112,7 +112,6 @@ export interface IngestionOptions {
   saveSourceText?: boolean;      // Whether to store original text in DB
   minConfidence?: number;        // Minimum confidence threshold (default: 0.0)
   apiKey?: string;              // Optional: Override API key
-  extractLatestTaxNews?: boolean;
 }
 
 /**
@@ -149,57 +148,7 @@ export class TaxAlertIngestionService {
 
     try {
       console.log(`🚀 Starting tax alert ingestion...`);
-
-      console.log(`🔔 extractLatestTaxNews status — "${options.extractLatestTaxNews}"`);
       
-      // Special: if extractLatestTaxNews is true OR no text provided, fetch news using the provided text as query
-      if (options.extractLatestTaxNews) {
-        try {
-          console.log(`🔔 extractLatestTaxNews enabled"`);
-          const articles = await fetchTopNews("tax", options.apiKey, 5);
-
-          // Build a JSON wrapper in the same pattern you described and ingest each title
-          for (let i = 0; i < articles.length; i++) {
-            const a = articles[i];
-            const jsonPayload = JSON.stringify({
-              status: 'ok',
-              totalResults: articles.length,
-              articles: articles
-            });
-
-            // We instruct the AI to extract info from the `title` field of each article.
-            const promptText = `You will receive a JSON object containing an array of news articles in the field \"articles\".\n` +
-              `For each article, extract structured tax-related information from the article TITLE only. Ignore the description and content.\n` +
-              `Respond with the same structure expected by the tax alert extractor. Here is the JSON:\n\n` + jsonPayload;
-
-            console.log(`📰 Sending article ${i + 1}/${articles.length} title to AI extractor: ${a.title}`);
-
-            const aiOutput = await extractTaxAlert(promptText, options.apiKey);
-
-            // Save each extracted alert to DB (use sourceDocument to reference news)
-            const savedAlert = await this.db.createFromAiOutput(
-              aiOutput,
-              `news:${a.source || 'unknown'}:${i + 1}`,
-              options.saveSourceText ? a.title : undefined
-            );
-
-            console.log(`💾 Saved news-derived alert ID: ${savedAlert.id}`);
-            // Return first successful result for the single-ingest API semantics
-            return {
-              success: true,
-              alert: savedAlert,
-              aiOutput,
-              confidence: aiOutput.confidence?.overall_score,
-              savedToDb: true
-            } as IngestionResult;
-          }
-        } catch (newsErr) {
-          const errMsg = newsErr instanceof Error ? newsErr.message : String(newsErr);
-          console.error(`❌ Failed to fetch or ingest latest market news: ${errMsg}`);
-          // fall through to normal ingestion flow
-        }
-      }
-
       // Step 0: If sourceDocument is provided and is a filename, extract from PDF
       if (options.sourceDocument && !options.sourceDocument.includes('\\') && !options.sourceDocument.includes('/')) {
         try {

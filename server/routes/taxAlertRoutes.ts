@@ -21,8 +21,7 @@ const ingestTextSchema = z.object({
   text: z.string().min(50, 'Text must be at least 50 characters'),
   sourceDocument: z.string().optional(),
   saveSourceText: z.boolean().optional().default(false),
-  minConfidence: z.number().min(0).max(1).optional().default(0),
-  extractLatestTaxNews: z.boolean().optional()
+  minConfidence: z.number().min(0).max(1).optional().default(0)
 });
 
 /**
@@ -110,13 +109,12 @@ function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => P
  * }
  */
 router.post('/ingest', validate(ingestTextSchema), asyncHandler(async (req, res) => {
-  const { text, sourceDocument, saveSourceText, minConfidence, extractLatestTaxNews } = req.body;
+  const { text, sourceDocument, saveSourceText, minConfidence } = req.body;
 
   const result = await ingestionService.ingest(text, {
     sourceDocument,
     saveSourceText,
-    minConfidence,
-    extractLatestTaxNews
+    minConfidence
   });
 
   if (result.success) {
