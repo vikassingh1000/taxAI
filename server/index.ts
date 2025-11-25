@@ -4,7 +4,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import taxAlertRoutes from "./routes/taxAlertRoutes";
 import newsConnectorRoutes from "./routes/newsConnectorRoutes";
-
+import assessRoutes from "./routes/assessRoutes";
 const app = express();
 
 declare module 'http' {
@@ -55,6 +55,9 @@ app.use((req, res, next) => {
   
   // Register news connector API routes
   app.use('/api/news-connector', newsConnectorRoutes);
+
+  // SOX gap assessment route
+  app.use('/api/assess', assessRoutes);
 
   const server = await registerRoutes(app);
 

@@ -9,6 +9,8 @@ import Dashboard from "@/pages/Dashboard";
 import PortfolioMetricsPage from "@/pages/PortfolioMetricsPage";
 import ProbabilityPage from "@/pages/ProbabilityPage";
 import GapsPage from "@/pages/GapsPage";
+import GapDetailsPage from "@/pages/GapDetailsPage";
+import GapDashboardPage from "@/pages/GapDashboardPage";
 import EnergyPage from "@/pages/EnergyPage";
 import RegulatoryPage from "@/pages/RegulatoryPage";
 import RealTimeFeedsPage from "@/pages/RealTimeFeedsPage";
@@ -18,6 +20,22 @@ import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+// function Router() {
+//   return (
+//     <Switch>
+//       <Route path="/" component={Dashboard} />
+//       <Route path="/metrics" component={PortfolioMetricsPage} />
+//       <Route path="/probability" component={ProbabilityPage} />
+//       <Route path="/gaps" component={GapsPage} />
+//       <Route path="/energy" component={EnergyPage} />
+//       <Route path="/regulatory" component={RegulatoryPage} />
+//       <Route path="/feeds" component={RealTimeFeedsPage} />
+//       <Route path="/config" component={PortfolioConfigPage} />
+//       <Route component={NotFound} />
+//     </Switch>
+//   );
+// }
+
 function Router() {
   return (
     <Switch>
@@ -25,6 +43,8 @@ function Router() {
       <Route path="/metrics" component={PortfolioMetricsPage} />
       <Route path="/probability" component={ProbabilityPage} />
       <Route path="/gaps" component={GapsPage} />
+      <Route path="/gaps/:gapId" component={GapDetailsPage} />
+      <Route path="/gaps-dashboard" component={GapDashboardPage} />
       <Route path="/energy" component={EnergyPage} />
       <Route path="/regulatory" component={RegulatoryPage} />
       <Route path="/feeds" component={RealTimeFeedsPage} />

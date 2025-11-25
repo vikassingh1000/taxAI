@@ -34,6 +34,11 @@ const menuItems = [
     icon: AlertCircle,
   },
   {
+    title: "Gap Dashboard",
+    url: "/gaps-dashboard",
+    icon: TrendingUp,
+  },
+  {
     title: "Energy Lens",
     url: "/energy",
     icon: Zap,
