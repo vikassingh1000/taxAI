@@ -280,7 +280,7 @@
 // to make space for the SOX gap assessment UI that calls /api/assess.
 
 import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -339,23 +339,35 @@ function getRiskLabel(score: number): { label: string; color: string } {
 export default function GapsPage() {
   const [, setLocation] = useLocation();
 
-  const [query, setQuery] = useState("");
+  const [userQuery, setUserQuery] = useState("");
   const [forceExtraction, setForceExtraction] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const { mutate, data, isPending, isError, error } = useMutation({
-    mutationFn: assessGaps,
+  const assessQuery = useQuery({
+    queryKey: ["gap-assessment"], 
+    queryFn: () =>
+      assessGaps({
+        query: userQuery,
+        force_extraction: forceExtraction,
+      }),
+    enabled: hasSubmitted,          
+    staleTime: Infinity,
+    keepPreviousData: true,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    mutate({ query: query.trim(), force_extraction: forceExtraction });
-  };
+  const { data, isFetching, isError, error } = assessQuery;
 
   const summary = data?.assessment?.summary;
   const gaps = data?.assessment?.gaps ?? [];
-
   const riskMeta = summary ? getRiskLabel(summary.overall_risk_score) : null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userQuery.trim()) return;
+
+    setHasSubmitted(true);
+    assessQuery.refetch();
+  };
 
   return (
     <div className="h-full w-full flex flex-col gap-4 p-6">
@@ -377,10 +389,7 @@ export default function GapsPage() {
 
       {/* Query card */}
       <Card className="p-4 space-y-4">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex-1 min-w-[260px]">
               <label className="text-xs font-medium text-muted-foreground block mb-1">
@@ -388,8 +397,8 @@ export default function GapsPage() {
               </label>
               <Input
                 placeholder="Type your question about SOX vs industry standards…"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                value={userQuery}
+                onChange={(e) => setUserQuery(e.target.value)}
               />
             </div>
 
@@ -406,10 +415,10 @@ export default function GapsPage() {
 
               <Button
                 type="submit"
-                disabled={isPending || !query.trim()}
+                disabled={!userQuery.trim() || isFetching}
                 className="whitespace-nowrap"
               >
-                {isPending ? "Assessing..." : "Assess Gaps"}
+                {isFetching ? "Assessing..." : "Assess Gaps"}
               </Button>
             </div>
           </div>
@@ -423,13 +432,23 @@ export default function GapsPage() {
 
         {data && (
           <p className="text-xs text-muted-foreground">
-            Showing results for: <span className="font-medium">{data.query}</span>
+            Showing results for: <span className="font-medium">{userQuery}</span>
           </p>
         )}
       </Card>
 
-      {/* Main layout: scorecard + table */}
-      {data && (
+      {/* Loader */}
+      {isFetching && (
+        <Card className="p-6 flex items-center justify-center mt-4">
+          <div className="flex flex-col items-center gap-2">
+            <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-xs text-muted-foreground">Retrieving assessment...</p>
+          </div>
+        </Card>
+      )}
+
+      {/* Main layout: only when we have data and not loading */}
+      {data && !isFetching && (
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-4 gap-4">
           {/* LEFT: Scorecard + insight */}
           <div className="xl:col-span-1 space-y-4">
@@ -565,9 +584,8 @@ export default function GapsPage() {
                         <td className="px-4 py-2 whitespace-nowrap">
                           {gap.risk_score}/10
                         </td>
-                        {/* <td className="px-4 py-2 whitespace-nowrap">
-                          {gap.priority}
-                        </td> */}
+
+                        {/* Priority badge */}
                         <td className="px-4 py-2 whitespace-nowrap">
                           <span
                             className={`
@@ -586,9 +604,11 @@ export default function GapsPage() {
                             {gap.priority}
                           </span>
                         </td>
+
                         <td className="px-4 py-2 whitespace-nowrap">
                           {gap.benchmark_source}
                         </td>
+
                         <td className="px-4 py-2 whitespace-nowrap">
                           <button
                             type="button"
@@ -600,6 +620,7 @@ export default function GapsPage() {
                         </td>
                       </tr>
                     ))}
+
                     {gaps.length === 0 && (
                       <tr>
                         <td
